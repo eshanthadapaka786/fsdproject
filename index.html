@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Goal Setter 🎯</title>
+
+<style>
+body {
+    font-family: 'Poppins', sans-serif;
+    background: linear-gradient(135deg,#d4f1f9,#ffe4ec);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+}
+
+.container {
+    background: white;
+    padding: 20px;
+    border-radius: 20px;
+    width: 350px;
+    box-shadow: 0 10px 20px rgba(0,0,0,0.1);
+    text-align: center;
+}
+
+h2 {
+    color: #6a5acd;
+}
+
+input, select {
+    padding: 7px;
+    margin: 5px;
+    border-radius: 10px;
+    border: 1px solid #ccc;
+    width: 90%;
+}
+
+button {
+    padding: 8px 12px;
+    border: none;
+    background: #6a5acd;
+    color: white;
+    border-radius: 10px;
+    cursor: pointer;
+}
+
+ul {
+    list-style: none;
+    padding: 0;
+}
+
+li {
+    background: #f0f8ff;
+    margin: 10px 0;
+    padding: 10px;
+    border-radius: 12px;
+    text-align: left;
+}
+
+.done {
+    text-decoration: line-through;
+    color: gray;
+}
+
+.high { border-left: 5px solid red; }
+.medium { border-left: 5px solid orange; }
+.low { border-left: 5px solid green; }
+
+.delete {
+    float: right;
+    background: red;
+    color: white;
+    border-radius: 6px;
+    padding: 3px 6px;
+    cursor: pointer;
+}
+</style>
+</head>
+
+<body>
+
+<div class="container">
+    <h2>🎯 Goal Setter</h2>
+
+    <input type="text" id="goalInput" placeholder="Enter your goal"><br>
+
+    <input type="datetime-local" id="deadlineInput"><br>
+
+    <select id="priority">
+        <option value="low">Low Priority</option>
+        <option value="medium">Medium Priority</option>
+        <option value="high">High Priority</option>
+    </select><br>
+
+    <button onclick="addGoal()">Add Goal</button>
+
+    <ul id="goalList"></ul>
+</div>
+
+<script>
+let goals = JSON.parse(localStorage.getItem("goals")) || [];
+
+function saveGoals(){
+    localStorage.setItem("goals", JSON.stringify(goals));
+}
+
+function renderGoals(){
+    let list = document.getElementById("goalList");
+    list.innerHTML = "";
+
+    goals.forEach((g, index) => {
+        let li = document.createElement("li");
+        li.className = g.priority;
+
+        li.innerHTML = `
+            <span onclick="toggleDone(${index})" class="${g.done ? 'done':''}">
+                ${g.name}
+            </span><br>
+            <small>📅 ${g.deadline}</small><br>
+            <small>Priority: ${g.priority}</small>
+            <button class="delete" onclick="deleteGoal(${index})">X</button>
+        `;
+
+        list.appendChild(li);
+    });
+}
+
+function addGoal(){
+    let name = document.getElementById("goalInput").value.trim();
+    let deadline = document.getElementById("deadlineInput").value;
+    let priority = document.getElementById("priority").value;
+
+    if(name === "" || deadline === ""){
+        alert("Enter goal & deadline 😭");
+        return;
+    }
+
+    goals.push({name, deadline, priority, done:false});
+    saveGoals();
+    renderGoals();
+
+    document.getElementById("goalInput").value = "";
+    document.getElementById("deadlineInput").value = "";
+}
+
+function deleteGoal(index){
+    goals.splice(index,1);
+    saveGoals();
+    renderGoals();
+}
+
+function toggleDone(index){
+    goals[index].done = !goals[index].done;
+    saveGoals();
+    renderGoals();
+}
+
+renderGoals();
+</script>
+
+</body>
+</html>
